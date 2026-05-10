@@ -82,7 +82,7 @@ exportBtn.addEventListener('click', () => {
         // 创建下载链接
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'buckettool-blacklist.txt';
+        a.download = 'bucketscan-blacklist.txt';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

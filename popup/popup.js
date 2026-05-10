@@ -252,7 +252,7 @@ function exportHistory(format) {
         }
         
         let content = '';
-        let filename = `buckettool-export-${new Date().toISOString().slice(0, 10)}`;
+        let filename = `bucketscan-export-${new Date().toISOString().slice(0, 10)}`;
         let mimeType = 'text/plain';
         
         switch (format) {
@@ -332,7 +332,7 @@ function convertToHTML(data) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BucketTool-2.0检测历史导出</title>
+    <title>Browser-BucketScan检测历史导出</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -404,7 +404,7 @@ function convertToHTML(data) {
     </style>
 </head>
 <body>
-    <h1>BucketTool-2.0检测历史导出</h1>
+    <h1>Browser-BucketScan检测历史导出</h1>
     <div class="meta">
         <p>导出时间: ${new Date().toLocaleString()}</p>
         <p>检测历史总数: ${data.length}</p>

@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "BucketTool-2.0",
+    "name": "Browser-BucketScan",
     "version": "2.0",
     "description": "BucketTool-2.0 - 各大云存储漏洞浏览器检测插件",
     "action": {

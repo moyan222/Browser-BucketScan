@@ -103,7 +103,7 @@ chrome.webRequest.onCompleted.addListener(
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "bucketvul-detect",
-        title: "用 BucketTool-2.0 检测",
+        title: "用 Browser-BucketScan 检测",
         contexts: ["link", "selection", "page"]
     });
 });
