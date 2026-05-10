@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BucketTool-2.0 设置</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+    <h2>扩展设置</h2>
+    <div style="margin-bottom:12px;">
+        <h3>检测黑名单</h3>
+        <div style="margin:8px 0;">
+            <input id="blacklist-input" type="text" placeholder="输入域名或URL，如 example.com 或 https://bucket.example.com" style="width:60%;padding:6px;" />
+            <button id="blacklist-add" style="padding:6px 12px;">添加</button>
+            <button id="blacklist-export" style="padding:6px 12px;margin-left:6px;">导出到文件</button>
+            <input type="file" id="blacklist-import" accept=".txt" style="display:none;" />
+            <button id="blacklist-import-btn" style="padding:6px 12px;margin-left:6px;">从文件导入</button>
+        </div>
+        <ul id="blacklist-list" style="list-style:none;padding:0;margin:0;"></ul>
+    </div>
+    <script src="options.js"></script>
+</body>
+
+</html>

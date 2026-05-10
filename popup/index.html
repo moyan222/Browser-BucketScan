@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BucketTool-2.0</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div id="app">
+        <h1>BucketTool-2.0</h1>
+        <div id="options-section" style="margin-bottom:10px;">
+            <label style="margin-right:12px;"><input type="checkbox" id="flag-enable" checked> 启用检测</label>
+            <label style="margin-right:12px;"><input type="checkbox" id="flag-acl" checked> 检测ACL</label>
+            <label style="margin-right:12px;"><input type="checkbox" id="flag-policy" checked> 检测Policy</label>
+            <label style="margin-right:12px;"><input type="checkbox" id="flag-traversable" checked> 检测遍历</label>
+            <label style="margin-right:12px;"><input type="checkbox" id="flag-upload" checked> 检测上传</label>
+            <label style="margin-right:12px;"><input type="checkbox" id="flag-delete" checked> 检测删除</label>
+            <label style="margin-right:12px;"><input type="checkbox" id="flag-takeover" checked> 检测接管</label>
+            <label><input type="checkbox" id="flag-multipart" checked> 检测分段上传</label>
+        </div>
+        <div class="action-buttons">
+            <button class="export-btn" data-format="json" title="导出JSON">导出JSON</button>
+            <button class="export-btn" data-format="csv" title="导出CSV">导出CSV</button>
+            <button class="export-btn" data-format="html" title="导出HTML">导出HTML</button>
+            <button id="clear-history" title="清空所有历史">清空历史</button>
+        </div>
+        <div id="history-section">
+            <h2>检测历史</h2>
+            <ul id="history-list">
+                <!-- 检测历史项将由 JS 动态插入 -->
+            </ul>
+            <div id="no-history" style="display:none; color:#888;">暂无检测历史</div>
+        </div>
+    </div>
+    <!-- 请求/响应体弹窗 -->
+    <div id="modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="modal-close">&times;</span>
+            <h3 id="modal-title"></h3>
+            <pre id="modal-body"></pre>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+
+</html>

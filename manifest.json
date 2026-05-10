@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "BucketTool-2.0",
+    "version": "2.0",
+    "description": "BucketTool-2.0 - 各大云存储漏洞浏览器检测插件",
+    "action": {
+        "default_popup": "popup/index.html"
+    },
+    "icons": {
+        "128": "icons/bucket.png"
+    },
+    "permissions": [
+        "storage",
+        "webRequest",
+        "contextMenus"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background/background.js",
+        "type": "module"
+    },
+    "options_ui": {
+        "page": "options/options.html",
+        "open_in_tab": true
+    }
+}

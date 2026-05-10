@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BucketTool-2.0 检测日志</title>
+    <style>
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        body {
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #233554 100%);
+            background-size: 200% 200%;
+            animation: gradient-shift 8s ease infinite;
+            margin: 0;
+            padding: 0;
+            color: #e0e6ed;
+            border: 1px solid rgba(45, 123, 229, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(45, 123, 229, 0.4), inset 0 0 30px rgba(45, 123, 229, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(100, 255, 218, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        #logbox {
+            background: rgba(17, 34, 64, 0.85);
+            backdrop-filter: blur(12px);
+            margin: 0;
+            padding: 20px;
+            border: 1px solid rgba(45, 123, 229, 0.4);
+            border-radius: 10px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(45, 123, 229, 0.15);
+            min-height: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+            animation: slide-in 0.4s ease-out;
+        }
+
+        #logbox::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #logbox::-webkit-scrollbar-track {
+            background: rgba(17, 34, 64, 0.5);
+            border-radius: 4px;
+        }
+
+        #logbox::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #2d7be5, #64ffda);
+            border-radius: 4px;
+        }
+
+        #logbox::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #64ffda, #2d7be5);
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64ffda 0%, #2d7be5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            text-shadow: 0 0 20px rgba(100, 255, 218, 0.6);
+            position: relative;
+            display: inline-block;
+            animation: slide-in 0.5s ease-out;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #64ffda, transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .logline {
+            font-size: 14px;
+            color: #e0e6ed;
+            margin-bottom: 12px;
+            word-break: break-all;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: rgba(35, 53, 84, 0.4);
+            backdrop-filter: blur(5px);
+            position: relative;
+            animation: slide-in 0.4s ease-out backwards;
+        }
+
+        .logline:nth-child(odd) { animation-delay: 0.05s; }
+        .logline:nth-child(even) { animation-delay: 0.1s; }
+
+        .logline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #64ffda, #2d7be5);
+            border-radius: 8px 0 0 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .logline:hover {
+            background: rgba(45, 123, 229, 0.3);
+            border-color: rgba(100, 255, 218, 0.5);
+            box-shadow: 0 4px 20px rgba(100, 255, 218, 0.3);
+            transform: translateX(4px);
+        }
+
+        .logline:hover::before {
+            opacity: 1;
+        }
+
+        .logline .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .logline .tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .logline .tag-vendor {
+            background: rgba(45, 123, 229, 0.3);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.5);
+        }
+
+        .logline .tag-type {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border: 1px solid rgba(252, 165, 165, 0.5);
+        }
+
+        .logline .tag-path {
+            background: rgba(100, 255, 218, 0.3);
+            color: #64ffda;
+            border: 1px solid rgba(100, 255, 218, 0.5);
+        }
+
+        .logline .tag-status {
+            background: rgba(234, 179, 8, 0.3);
+            color: #fde047;
+            border: 1px solid rgba(253, 224, 71, 0.5);
+        }
+
+        .logline .tag-found {
+            background: rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            border: 1px solid rgba(134, 239, 172, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .logline .tag-notfound {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border: 1px solid rgba(252, 165, 165, 0.5);
+        }
+
+        .logline details {
+            margin-top: 8px;
+        }
+
+        .logline summary {
+            cursor: pointer;
+            color: #64ffda;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .logline summary:hover {
+            background: rgba(100, 255, 218, 0.2);
+        }
+
+        .logline pre {
+            background: rgba(10, 25, 47, 0.8);
+            border: 1px solid rgba(45, 123, 229, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .vendor-checkbox {
+            margin-right: 6px;
+            width: 16px;
+            height: 16px;
+            accent-color: #64ffda;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .vendor-checkbox:checked {
+            transform: scale(1.1);
+        }
+
+        label {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        label:hover {
+            background: rgba(45, 123, 229, 0.2);
+        }
+
+        #start-detect {
+            margin-left: 18px;
+            padding: 8px 24px;
+            background: linear-gradient(135deg, #2d7be5 0%, #16a085 100%);
+            background-size: 200% 200%;
+            color: #fff;
+            border: 1px solid rgba(45, 123, 229, 0.6);
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(45, 123, 229, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #start-detect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        #start-detect:hover {
+            background: linear-gradient(135deg, #16a085 0%, #2d7be5 100%);
+            background-position: 100% 50%;
+            box-shadow: 0 6px 25px rgba(45, 123, 229, 0.6);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        #start-detect:hover::before {
+            left: 100%;
+        }
+
+        #start-detect:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        #log {
+            margin-top: 16px;
+        }
+        </style>
+</head>
+
+<body>
+    <div id="logbox">
+        <h2>检测日志</h2>
+        <div style="margin-bottom: 12px;">
+            <label><input type="checkbox" class="vendor-checkbox" value="aliyun" checked> 阿里云</label>
+            <label style="margin-left: 10px;"><input type="checkbox" class="vendor-checkbox" value="tencent" checked>
+                腾讯云</label>
+            <label style="margin-left: 10px;"><input type="checkbox" class="vendor-checkbox" value="huawei" checked>
+                华为云</label>
+            <label style="margin-left: 10px;"><input type="checkbox" class="vendor-checkbox" value="AmazonS3" checked>
+                AWS S3</label>
+            <label style="margin-left: 10px;"><input type="checkbox" class="vendor-checkbox" value="京东云" checked>
+                京东云</label>
+            <label style="margin-left: 10px;"><input type="checkbox" class="vendor-checkbox" value="百度云" checked>
+                百度云</label>
+            <label style="margin-left: 10px;"><input type="checkbox" class="vendor-checkbox" value="火山云" checked>
+                火山云</label>
+            <button id="start-detect" style="margin-left: 18px; padding: 2px 10px;">开始检测</button>
+        </div>
+        <div id="log"></div>
+    </div>
+    <script src="log.js"></script>
+</body>
+
+</html>
