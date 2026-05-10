@@ -315,12 +315,88 @@
         #log {
             margin-top: 16px;
         }
+
+        #batch-section {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(35, 53, 84, 0.5);
+            border: 1px solid rgba(45, 123, 229, 0.3);
+            border-radius: 8px;
+        }
+
+        #batch-section:hover {
+            border-color: rgba(100, 255, 218, 0.4);
+        }
+
+        #url-textarea {
+            width: 100%;
+            height: 80px;
+            padding: 8px;
+            margin-top: 8px;
+            border-radius: 6px;
+            background: rgba(10, 25, 47, 0.8);
+            color: #e0e6ed;
+            border: 1px solid rgba(45, 123, 229, 0.3);
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            font-size: 13px;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+
+        #url-textarea:focus {
+            outline: none;
+            border-color: #64ffda;
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.15);
+        }
+
+        #url-textarea::placeholder {
+            color: #5a6a8a;
+        }
+
+        .batch-toolbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #import-btn {
+            padding: 6px 16px;
+            background: rgba(45, 123, 229, 0.25);
+            color: #60a5fa;
+            border: 1px solid rgba(45, 123, 229, 0.5);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #import-btn:hover {
+            background: rgba(45, 123, 229, 0.4);
+            border-color: #60a5fa;
+        }
+
+        .batch-hint {
+            color: #5a6a8a;
+            font-size: 12px;
+            margin-left: 4px;
+        }
         </style>
 </head>
 
 <body>
     <div id="logbox">
         <h2>检测日志</h2>
+        <div id="batch-section">
+            <div class="batch-toolbar">
+                <button id="import-btn">导入URL文件</button>
+                <span class="batch-hint">或粘贴URL（每行一个）</span>
+                <input type="file" id="file-input" accept=".txt" style="display:none;">
+            </div>
+            <textarea id="url-textarea" placeholder="https://bucket1.oss-cn-beijing.aliyuncs.com&#10;https://bucket2.cos.ap-shanghai.myqcloud.com&#10;https://bucket3.s3.amazonaws.com"></textarea>
+        </div>
         <div style="margin-bottom: 12px;">
             <label><input type="checkbox" class="vendor-checkbox" value="aliyun" checked> 阿里云</label>
             <label style="margin-left: 10px;"><input type="checkbox" class="vendor-checkbox" value="tencent" checked>
@@ -336,6 +412,7 @@
             <label style="margin-left: 10px;"><input type="checkbox" class="vendor-checkbox" value="火山云" checked>
                 火山云</label>
             <button id="start-detect" style="margin-left: 18px; padding: 2px 10px;">开始检测</button>
+            <span id="url-count" class="batch-hint" style="margin-left:8px;"></span>
         </div>
         <div id="log"></div>
     </div>

@@ -8,19 +8,67 @@ function getSelectedVendors() {
     return selected;
 }
 
-// 新增：点击开始检测
+// 新增：点击开始检测 — 支持批量/单URL
 const startBtn = document.getElementById('start-detect');
 if (startBtn) {
     startBtn.addEventListener('click', () => {
         const vendors = getSelectedVendors();
-        let vulUrl = prompt('请输入要检测的存储桶URL：');
-        if (!vulUrl) {
-            addLog('未输入URL，检测取消');
+        const textarea = document.getElementById('url-textarea');
+        let urls = textarea.value.trim().split('\n')
+            .map(u => u.trim())
+            .filter(u => u.length > 0 && (u.startsWith('http://') || u.startsWith('https://')));
+        if (urls.length === 0) {
+            // 回退：单URL prompt 模式
+            let vulUrl = prompt('请输入要检测的存储桶URL：');
+            if (!vulUrl) {
+                addLog('未输入URL，检测取消');
+                return;
+            }
+            chrome.runtime.sendMessage({ type: 'manual-detect', vendors, vulUrl });
+            addLog('已发起检测，厂商: ' + (vendors.length ? vendors.join(', ') : '全部'));
             return;
         }
-        chrome.runtime.sendMessage({ type: 'manual-detect', vendors, vulUrl });
-        addLog('已发起检测，厂商: ' + (vendors.length ? vendors.join(', ') : '全部'));
+        chrome.runtime.sendMessage({ type: 'batch-manual-detect', vendors, urls });
+        addLog('已发起批量检测，共 ' + urls.length + ' 个URL，厂商: ' + (vendors.length ? vendors.join(', ') : '全部'));
+        textarea.value = '';
+        document.getElementById('url-count').textContent = '';
     });
+}
+
+// 文件导入
+const importBtn = document.getElementById('import-btn');
+const fileInput = document.getElementById('file-input');
+if (importBtn && fileInput) {
+    importBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const textarea = document.getElementById('url-textarea');
+            textarea.value = evt.target.result;
+            const count = evt.target.result.trim().split('\n').filter(l => l.trim()).length;
+            addLog('已导入文件 ' + file.name + '，共 ' + count + ' 个URL');
+            updateUrlCount();
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    });
+}
+
+// URL 计数
+const urlTextarea = document.getElementById('url-textarea');
+if (urlTextarea) {
+    urlTextarea.addEventListener('input', updateUrlCount);
+}
+function updateUrlCount() {
+    const el = document.getElementById('url-count');
+    if (!el) return;
+    const textarea = document.getElementById('url-textarea');
+    const urls = textarea.value.trim().split('\n')
+        .map(u => u.trim())
+        .filter(u => u.length > 0 && (u.startsWith('http://') || u.startsWith('https://')));
+    el.textContent = urls.length > 0 ? '已识别 ' + urls.length + ' 个URL' : '';
 }
 
 function escapeHtml(str) {
@@ -79,6 +127,16 @@ ${escapeHtml(msg.response || '')}</pre></details>
             line.innerHTML = `<span style='color:#27ae60'>[检测完成]</span>`;
         } else if (msg.event === 'error') {
             line.innerHTML = `<span style='color:#c0392b'>[检测失败]</span> ${escapeHtml(msg.error)} `;
+        } else if (msg.event === 'batch-start') {
+            line.innerHTML = `<span style='color:#2d7be5'>[批量检测]</span> 共 <b>${msg.total}</b> 个URL，开始检测...`;
+        } else if (msg.event === 'batch-url-start') {
+            line.innerHTML = `<span style='color:#16a085'>[${msg.index}/${msg.total}]</span> <span style='color:#64ffda'>${escapeHtml(msg.url)}</span>`;
+        } else if (msg.event === 'batch-url-skip') {
+            line.innerHTML = `<span style='color:#888'>[${msg.index}/${msg.total}]</span> <span style='color:#8892b0'>${escapeHtml(msg.url)}</span> <span style='color:#888'>— 跳过（${escapeHtml(msg.reason || '')}）</span>`;
+        } else if (msg.event === 'batch-url-result') {
+            line.innerHTML = `<span style='color:#2d7be5'>[完成]</span> <span style='color:#64ffda'>${escapeHtml(msg.url)}</span> — 发现 <b style='color:${msg.found > 0 ? '#ef4444' : '#888'}'>${msg.found}</b> 个漏洞`;
+        } else if (msg.event === 'batch-finish') {
+            line.innerHTML = `<span style='color:#27ae60'>[批量检测完成]</span> 共检测 <b>${msg.total}</b> 个URL，发现 <b style='color:#ef4444'>${msg.found}</b> 个漏洞`;
         } else {
             line.textContent = `[${new Date().toLocaleTimeString()}] ` + JSON.stringify(msg);
         }
