@@ -85,7 +85,7 @@ function addLogDetail(result) {
         `URL: <span style="color:#2d7be5">${escapeHtml(result.url || '')}</span><br>` +
         (result.statusCode ? `响应码: <span style="color:#e67e22">${escapeHtml(result.statusCode + '')}</span><br>` : '') +
         (result.detail ? `详情: <span>${escapeHtml(result.detail)}</span><br>` : '') +
-        `<details><summary>请求/响应</summary><pre style="background:#f4f4f4;padding:6px;">${escapeHtml(result.request || '')}
+        `<details><summary>请求/响应</summary><pre style="background:rgba(10,25,47,0.8);padding:6px;">${escapeHtml(result.request || '')}
 
 ${escapeHtml(result.response || '')}</pre></details>`;
     logDiv.appendChild(line);
@@ -119,7 +119,7 @@ function addLog(msg) {
                 <span class='tag tag-found'>发现漏洞</span>
                 <span class='tag tag-source' style='${msg.source === '主动' ? 'background:#eaf6ff;color:#2d7be5;' : 'background:#fbeee6;color:#c0392b;'}'>${escapeHtml(msg.source || '未知')}</span>
                 ${msg.detail ? `<div style='margin:2px 0 2px 0;'>详情: <span>${escapeHtml(msg.detail)}</span></div>` : ''}
-                <details><summary style='cursor:pointer'>请求/响应</summary><pre style='background:#f4f4f4;padding:6px;'>${escapeHtml(msg.request || '')}
+                <details><summary style='cursor:pointer'>请求/响应</summary><pre style='background:rgba(10,25,47,0.8);padding:6px;'>${escapeHtml(msg.request || '')}
 
 ${escapeHtml(msg.response || '')}</pre></details>
             `;
