@@ -256,31 +256,10 @@ function exportHistory(format) {
         let mimeType = 'text/plain';
         
         switch (format) {
-            case 'json':
-                // 优化JSON导出，包含完整数据包和元信息
-                const jsonExport = {
-                    exportInfo: {
-                        exportTime: new Date().toISOString(),
-                        exportDate: new Date().toLocaleString(),
-                        totalCount: history.length,
-                        formatVersion: '1.0'
-                    },
-                    detectionHistory: history.map((item, index) => ({
-                        index: index + 1,
-                        id: item.id,
-                        url: item.url,
-                        type: item.type,
-                        vendor: item.vendor,
-                        time: item.time,
-                        timeFormatted: formatTime(item.time),
-                        source: item.source,
-                        request: item.request, // 完整的请求数据包
-                        response: item.response // 完整的响应数据包
-                    }))
-                };
-                content = JSON.stringify(jsonExport, null, 2);
-                filename += '.json';
-                mimeType = 'application/json';
+            case 'md':
+                content = convertToMD(history);
+                filename += '.md';
+                mimeType = 'text/markdown';
                 break;
             case 'csv':
                 content = convertToCSV(history);
@@ -449,6 +428,40 @@ function convertToHTML(data) {
 </html>
     `;
     return html;
+}
+
+// 转MD
+function convertToMD(data) {
+    if (!data.length) return '';
+    let md = `# Browser-BucketScan 检测历史导出\n\n`;
+    md += `- 导出时间: ${new Date().toLocaleString()}\n`;
+    md += `- 检测历史总数: ${data.length}\n\n`;
+    md += `| 序号 | URL | 漏洞类型 | 云厂商 | 检测时间 | 来源 |\n`;
+    md += `| --- | --- | --- | --- | --- | --- |\n`;
+    data.forEach((item, index) => {
+        const url = (item.url || '').replace(/\|/g, '\\|');
+        const type = (item.type || '').replace(/\|/g, '\\|');
+        const vendor = (item.vendor || '').replace(/\|/g, '\\|');
+        const time = formatTime(item.time) || '';
+        const source = (item.source || '').replace(/\|/g, '\\|');
+        md += `| ${index + 1} | ${url} | ${type} | ${vendor} | ${time} | ${source} |\n`;
+    });
+    md += `\n---\n\n`;
+    data.forEach((item, index) => {
+        md += `### ${index + 1}. ${item.type || '未知'}\n\n`;
+        md += `- **URL**: \`${(item.url || '').replace(/\|/g, '\\|')}\`\n`;
+        md += `- **云厂商**: ${item.vendor || '未知'}\n`;
+        md += `- **检测时间**: ${formatTime(item.time)}\n`;
+        md += `- **来源**: ${item.source || '未知'}\n\n`;
+        if (item.request) {
+            md += `**请求数据包：**\n\`\`\`\n${item.request}\n\`\`\`\n\n`;
+        }
+        if (item.response) {
+            md += `**响应数据包：**\n\`\`\`\n${item.response}\n\`\`\`\n\n`;
+        }
+        md += `---\n\n`;
+    });
+    return md;
 }
 
 // 下载文件
